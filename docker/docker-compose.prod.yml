@@ -44,13 +44,10 @@ services:
       context: ..
       dockerfile: docker/Dockerfile.web.prod
     ports:
-      - "443:443"
       - "80:80"
     depends_on:
       - api
     restart: always
-    volumes:
-      - ./nginx/certs:/etc/nginx/certs:ro
 
 volumes:
   pgdata_prod:

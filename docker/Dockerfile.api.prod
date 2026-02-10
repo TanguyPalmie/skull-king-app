@@ -1,5 +1,6 @@
 FROM node:22-alpine AS builder
 
+RUN apk add --no-cache python3 make g++
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
@@ -8,10 +9,13 @@ COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* ./
 COPY apps/api/package.json apps/api/
 COPY packages/shared/package.json packages/shared/
 
-RUN pnpm install --frozen-lockfile --prod || pnpm install --prod
+RUN pnpm install --frozen-lockfile || pnpm install
 
 COPY packages/shared/ packages/shared/
 COPY apps/api/ apps/api/
+
+# Prune devDependencies after build
+RUN pnpm prune --prod
 
 FROM node:22-alpine
 
