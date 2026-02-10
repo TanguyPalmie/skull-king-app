@@ -1,0 +1,31 @@
+FROM node:22-alpine AS builder
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+WORKDIR /app
+
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* ./
+COPY apps/api/package.json apps/api/
+COPY packages/shared/package.json packages/shared/
+
+RUN pnpm install --frozen-lockfile --prod || pnpm install --prod
+
+COPY packages/shared/ packages/shared/
+COPY apps/api/ apps/api/
+
+FROM node:22-alpine
+
+RUN addgroup -g 1001 taggy && adduser -u 1001 -G taggy -s /bin/sh -D taggy
+
+WORKDIR /app
+
+COPY --from=builder --chown=taggy:taggy /app /app
+
+USER taggy
+
+EXPOSE 4000
+
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD node -e "fetch('http://localhost:4000/health').then(r => r.ok ? process.exit(0) : process.exit(1))"
+
+CMD ["node", "apps/api/src/index.js"]

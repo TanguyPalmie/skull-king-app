@@ -1,0 +1,9 @@
+{
+  "name": "@taggy/shared",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.js",
+  "scripts": {
+    "lint": "echo 'shared lint ok'"
+  }
+}

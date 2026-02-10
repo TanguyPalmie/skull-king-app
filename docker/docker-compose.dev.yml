@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: taggy
+      POSTGRES_PASSWORD: taggy_dev
+      POSTGRES_DB: taggy_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taggy"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api.dev
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: development
+      PORT: 4000
+      DATABASE_URL: postgres://taggy:taggy_dev@postgres:5432/taggy_dev
+      JWT_SECRET: dev-jwt-secret-change-in-prod
+      JWT_REFRESH_SECRET: dev-refresh-secret-change-in-prod
+      CORS_ORIGIN: http://localhost:3000
+      SMS_PROVIDER: console
+      EMAIL_PROVIDER: console
+      STRIPE_SECRET_KEY: sk_test_placeholder
+      STRIPE_WEBHOOK_SECRET: whsec_placeholder
+    volumes:
+      - ../apps/api/src:/app/apps/api/src
+      - ../packages/shared/src:/app/packages/shared/src
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "cd apps/api && pnpm migrate && pnpm seed && pnpm dev"
+
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.web.dev
+    ports:
+      - "3000:3000"
+    environment:
+      VITE_API_URL: http://localhost:4000
+    volumes:
+      - ../apps/web/src:/app/apps/web/src
+      - ../apps/web/index.html:/app/apps/web/index.html
+    depends_on:
+      - api
+
+volumes:
+  pgdata_dev:

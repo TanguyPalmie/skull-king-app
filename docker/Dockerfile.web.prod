@@ -1,0 +1,28 @@
+FROM node:22-alpine AS builder
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+WORKDIR /app
+
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* ./
+COPY apps/web/package.json apps/web/
+COPY packages/shared/package.json packages/shared/
+
+RUN pnpm install --frozen-lockfile || pnpm install
+
+COPY packages/shared/ packages/shared/
+COPY apps/web/ apps/web/
+
+WORKDIR /app/apps/web
+RUN pnpm build
+
+FROM nginx:alpine
+
+RUN adduser -u 1001 -D taggy
+
+COPY docker/nginx/nginx.prod.conf /etc/nginx/nginx.conf
+COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
+
+EXPOSE 80 443
+
+CMD ["nginx", "-g", "daemon off;"]
