@@ -7,6 +7,7 @@ import AppShell from './components/layout/AppShell';
 import LoginPage from './pages/auth/LoginPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
+import RegisterPage from './pages/auth/RegisterPage';
 
 import LanguageSelect from './pages/onboarding/LanguageSelect';
 import PhoneStep from './pages/onboarding/PhoneStep';
@@ -78,6 +79,14 @@ export default function AppRouter() {
         element={
           <PublicRoute>
             <ResetPasswordPage />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          <PublicRoute>
+            <RegisterPage />
           </PublicRoute>
         }
       />

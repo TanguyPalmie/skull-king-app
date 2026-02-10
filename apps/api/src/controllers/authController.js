@@ -16,7 +16,7 @@ function setRefreshCookie(res, token) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    path: '/auth/refresh',
+    path: '/',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 }
@@ -29,7 +29,7 @@ function clearRefreshCookie(res) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    path: '/auth/refresh',
+    path: '/',
   });
 }
 
@@ -83,6 +83,54 @@ const authController = {
           display_name: user.display_name,
         },
         isNewUser,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  /**
+   * POST /auth/register
+   * Create a new account with email and password (no phone required).
+   */
+  async register(req, res, next) {
+    try {
+      const { email, password, display_name } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password are required' });
+      }
+
+      if (password.length < 8) {
+        return res.status(400).json({ error: 'Password must be at least 8 characters' });
+      }
+
+      const existing = await userRepo.findByEmail(email);
+      if (existing) {
+        return res.status(409).json({ error: 'An account with this email already exists' });
+      }
+
+      const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+
+      const user = await userRepo.create({
+        email,
+        password_hash: passwordHash,
+        display_name: display_name || null,
+      });
+
+      const accessToken = tokenService.generateAccessToken(user);
+      const refreshToken = await tokenService.generateRefreshToken(user);
+
+      setRefreshCookie(res, refreshToken);
+
+      res.status(201).json({
+        accessToken,
+        user: {
+          id: user.id,
+          phone: user.phone_e164,
+          email: user.email,
+          display_name: user.display_name,
+        },
       });
     } catch (err) {
       next(err);
@@ -149,7 +197,15 @@ const authController = {
 
       setRefreshCookie(res, refreshToken);
 
-      res.status(200).json({ accessToken });
+      res.status(200).json({
+        accessToken,
+        user: {
+          id: user.id,
+          phone: user.phone_e164,
+          email: user.email,
+          display_name: user.display_name,
+        },
+      });
     } catch (err) {
       next(err);
     }

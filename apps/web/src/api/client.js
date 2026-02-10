@@ -50,7 +50,7 @@ async function parseResponse(response) {
   if (contentType && contentType.includes('application/json')) {
     const data = await response.json();
     if (!response.ok) {
-      const error = new Error(data.message || 'Request failed');
+      const error = new Error(data.error || data.message || 'Request failed');
       error.status = response.status;
       error.data = data;
       throw error;

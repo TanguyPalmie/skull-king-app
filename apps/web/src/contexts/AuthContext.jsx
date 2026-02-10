@@ -40,11 +40,18 @@ export function AuthProvider({ children }) {
 
   const refreshToken = useCallback(async () => {
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+
       const res = await fetch(`${API_BASE}/auth/refresh`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
       });
+
+      clearTimeout(timeout);
+
       if (res.ok) {
         const data = await res.json();
         setAccessToken(data.accessToken);

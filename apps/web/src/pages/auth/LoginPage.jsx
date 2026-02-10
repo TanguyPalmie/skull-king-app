@@ -41,7 +41,7 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
     try {
-      await apiClient.post('/auth/otp/send', { phone: phone.trim() });
+      await apiClient.post('/auth/request-otp', { phone: phone.trim() });
       setOtpSent(true);
     } catch (err) {
       setError(err.message || t('common.error'));
@@ -55,7 +55,7 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
     try {
-      const data = await apiClient.post('/auth/login/phone', {
+      const data = await apiClient.post('/auth/verify-otp', {
         phone: phone.trim(),
         code: otp,
       });
@@ -227,7 +227,7 @@ export default function LoginPage() {
       <Box sx={{ textAlign: 'center' }}>
         <Typography variant="body2" color="text.secondary">
           {t('auth.noAccount')}{' '}
-          <Link component={RouterLink} to="/onboarding" underline="hover">
+          <Link component={RouterLink} to="/register" underline="hover">
             {t('auth.register')}
           </Link>
         </Typography>
