@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_USER: taggy
       POSTGRES_PASSWORD: taggy_dev
-      POSTGRES_DB: taggy_dev
+      POSTGRES_DB: taggy
     ports:
       - "5432:5432"
     volumes:
@@ -24,7 +24,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 4000
-      DATABASE_URL: postgres://taggy:taggy_dev@postgres:5432/taggy_dev
+      DATABASE_URL: postgres://taggy:taggy_dev@postgres:5432/taggy
       JWT_SECRET: dev-jwt-secret-change-in-prod
       JWT_REFRESH_SECRET: dev-refresh-secret-change-in-prod
       CORS_ORIGIN: http://localhost:3000
