@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const otpService = require('../services/otpService');
 const tokenService = require('../services/tokenService');
 const emailService = require('../services/emailService');

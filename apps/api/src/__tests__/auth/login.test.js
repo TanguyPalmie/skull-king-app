@@ -1,6 +1,6 @@
 const request = require('supertest');
 const app = require('../../index');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const userRepo = require('../../repositories/userRepo');
 const tokenService = require('../../services/tokenService');
 

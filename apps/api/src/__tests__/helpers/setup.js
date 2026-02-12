@@ -21,7 +21,7 @@ async function cleanDb() {
 }
 
 async function createTestUser(overrides = {}) {
-  const bcrypt = require('bcrypt');
+  const bcrypt = require('bcryptjs');
   const p = getPool();
   const phone = overrides.phone || '+33600000099';
   const passHash = overrides.password ? await bcrypt.hash(overrides.password, 10) : null;
