@@ -33,7 +33,7 @@ services:
     depends_on:
       postgres-test:
         condition: service_healthy
-    command: sh -c "cd apps/api && pnpm migrate && pnpm seed && pnpm test"
+    command: sh -c "pnpm migrate && pnpm seed && pnpm test"
 
   web-test:
     build:
@@ -41,4 +41,4 @@ services:
       dockerfile: docker/Dockerfile.web.dev
     environment:
       VITE_API_URL: http://localhost:4000
-    command: sh -c "cd apps/web && pnpm test"
+    command: sh -c "pnpm test"

@@ -38,7 +38,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    command: sh -c "cd apps/api && pnpm migrate && pnpm seed && pnpm dev"
+    command: sh -c "pnpm migrate && pnpm seed && pnpm dev"
 
   web:
     build:
